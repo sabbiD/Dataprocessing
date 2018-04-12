@@ -11,7 +11,8 @@ from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 
-TARGET_URL = "http://www.imdb.com/search/title?num_votes=5000,&sort=user_rating,desc&start=1&title_type=tv_series"
+
+TARGET_URL = "http://www.imdb.com/search/title?num_votes=5000,&sort=user_rating,desc&title_type=tv_series"
 BACKUP_HTML = 'tvseries.html'
 OUTPUT_CSV = 'tvseries.csv'
 
@@ -32,49 +33,76 @@ def extract_tvseries(dom):
     lists= dom("h3", "lister-item-header")
     for link in lists:
         title = link.contents[3]
+
+        # check if title is available
+        if not title:
+            title = "No info available"
+
         title_list.append(title.string)
 
     ratings_list = []
     ratings = dom("span", "value")
     for rate in ratings:
         rated = rate.contents[0]
+
+        # check if rating is available
+        if not rated:
+            rated = "No info available"
+
         ratings_list.append(rated.string)
 
     genres_list = []
     genres = dom("span", "genre")
     for genre in genres:
         theme = genre.contents[0]
+
+        # check if themes are available
+        if not theme:
+            theme = "No info available"
+
         genres_list.append(theme.string)
+
 
     actors_list = []
     cast = ""
     counter = 0
-    actors = dom.find_all(href = re.compile("adv_li_st"))
-    for actor in actors:
-        actor = actor.string
-        cast+=str(actor)
-        counter+= 1
-        
-        # after every actor name add a comma except for the last name in the string
-        if counter % 4 != 0:
-            cast+=str(",")
+	
+    lists = dom("div", "lister-item-content")
+    for movies in lists:
+        movie = movies(href = re.compile("adv_li_st"))
+        for actor in movie:
+            
+            counter += 1 
+            actors = actor.string
+            cast += str(actors)
 
-        # put every group of four actors as one string in the actors list
-        if counter % 4 == 0:
-            actors_list.append(cast)
-            cast = ""
+            # add a comma after actor except for the last name
+            if counter % len(movie) != 0:
+               cast += str(", ")
 
+            # check for missing cast
+            if cast == "":
+                cast = "No info available"
+
+        actors_list.append(cast)
+        cast = ""
+    
     time_list = []
     times = dom("span", "runtime")
     for time in times:
         runtime = time.contents[0]
+
+        # check for missing runtime
+        if not runtime:
+            runtime = "No info available"
+
         time_list.append(runtime.string.strip("min"))
 
     # lists information about single series in list then 
     # appends that list to list containing all series
     tvseries = []
     total = []
-    for i in range (50):
+    for i in range (len(title_list)):
         total.extend((title_list[i], ratings_list[i], genres_list[i].strip(), actors_list[i], time_list[i]))
 
         tvseries.append(total)
@@ -91,7 +119,7 @@ def save_csv(outfile, tvseries):
     writer.writerow(['Title', 'Rating', 'Genre', 'Actors', 'Runtime'])
 
     # write series and information to rows in CSV file
-    for i in range (50):
+    for i in range (len(tvseries)):
         writer.writerow(tvseries[i])
 
 
