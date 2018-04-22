@@ -17,7 +17,6 @@
 
 		</canvas>
 	</p>
-
 	<script>
 
 	//XMLHTTPRequest
@@ -58,6 +57,7 @@
 			startDate = datess[0].getTime();
 
 			// save days from 1 to 365 in dates list
+			// milliseconds per day = 8640000
 			dates.push((datee/86400000 - startDate/86400000) + 1);
 
 			// save temperatures in temp list
@@ -185,7 +185,8 @@
 	    }
 	}
 }
-
+		
+	// accessing data via url for XMLHTTPRequest
 	var url = "https://raw.githubusercontent.com/sabbiD/Dataprocessing/master/Homework/Week_2/KNMI_20180401.txt";
 	var oReq = new XMLHttpRequest();
 	oReq.addEventListener('load', reqListener);
