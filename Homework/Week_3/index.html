@@ -55,10 +55,23 @@ Sources:
         <script type="text/javascript">
 
         // adding description 
-        d3.select("head").append("title").text("Fietsdepot Amsterdam Jaaroverzicht 2016");
-        d3.select("body").append("p").text("Waar komen de fietsen in het Fietsdepot Amsterdam vandaan?").style("font-family", "lucida console").style("font-size", "25px").style("color", "#8c510a");
-        d3.select("body").append("p").text("Dataprocessing").style("font-family", "lucida console").style("font-size", "15px").style("color", "#01665e");
-        d3.select("body").append("p").text("Sebile Demirtas 10548270").style("font-family", "lucida console").style("font-size", "12px").style("color", "#5ab4ac");
+        d3.select("head").append("title")
+            .text("Fietsdepot Amsterdam Jaaroverzicht 2016");
+        d3.select("body").append("p")
+            .text("Waar komen de fietsen in het Fietsdepot Amsterdam vandaan?")
+            .style("font-family", "lucida console")
+            .style("font-size", "20px")
+            .style("color", "#8c510a");
+        d3.select("body").append("p")
+            .text("Dataprocessing")
+            .style("font-family", "lucida console")
+            .style("font-size", "15px")
+            .style("color", "#01665e");
+        d3.select("body").append("p")
+            .text("Sebile Demirtas 10548270")
+            .style("font-family", "lucida console")
+            .style("font-size", "12px")
+            .style("color", "#5ab4ac");
 
         // accessing dataset
         d3.json('fietsen.json', function(data){
