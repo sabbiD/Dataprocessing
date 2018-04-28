@@ -1,0 +1,193 @@
+<!-- Fietsendepot Amsterdam Jaaroverzicht 2016 Bar Chart 
+Sebile Demirtas: 10548270
+Minor Programmeren
+Dataprocessing
+I chose to not use an X axis because some of my bars are really small and even a really thin line made them unclear. Also the color-change attribute when hovering on a bar did work before adding the legend but unfortunately I could not get it to work again. I did keep the code for it in the html.
+
+Sources:
+- www.alignedleft.com/tutorials/d3 (background knowledge about d3 and bar charts)
+- http://bl.ocks.org/Caged/6476579 (d3 tooltips)
+- https://bl.ocks.org/bricedev/0d95074b6d83a77dc3ad (legend for bar chart)
+-->
+<!DOCTYPE html>
+<html lang="en">
+    <head align="center">
+        <meta charset="utf-8">
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+    <style>
+    rect hover{
+        fill: orange;
+    }
+
+    .d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(1,102,94, 0.8);
+    color: #fff;
+    border-radius: 4px;
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 50%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+    }
+
+    /* Style northward tooltips differently */
+    .d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+    </style>
+    <script type="text/javascript" src="d3/d3.v3.js"></script>
+    </head>
+    <body align="center">
+        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <script src="https://d3js.org/d3-axis.v1.min.js"></script>
+        <script type="text/javascript">
+
+        // adding description 
+        d3.select("head").append("title").text("Fietsdepot Amsterdam Jaaroverzicht 2016");
+        d3.select("body").append("p").text("Waar komen de fietsen in het Fietsdepot Amsterdam vandaan?").style("font-family", "lucida console").style("font-size", "25px").style("color", "#8c510a");
+        d3.select("body").append("p").text("Dataprocessing").style("font-family", "lucida console").style("font-size", "15px").style("color", "#01665e");
+        d3.select("body").append("p").text("Sebile Demirtas 10548270").style("font-family", "lucida console").style("font-size", "12px").style("color", "#5ab4ac");
+
+        // accessing dataset
+        d3.json('fietsen.json', function(data){
+
+            var categorie = []
+            var total = 0
+
+            // accumulating categories in dataset
+            // calculating total amount of bikes
+            for (var i = 0; i < data.Fietsen.length; i++){
+                categorie.push(data.Fietsen[i]["Procentueel"])
+                total += Number(data.Fietsen[i]['2016A'])
+            };
+                
+            // declaring width, height, and padding between bars 
+            var w = 500 
+            var h = 500 
+            var barPadding = 2;
+
+            // ordinal scale format of categories
+            var categories = d3.scale.ordinal()
+            .range(categorie);
+
+            // ordinal scale of colors used in chart
+            var color = d3.scale.ordinal()
+            .range(["#8c510a","#d8b365","#f6e8c3","#c7eae5","#5ab4ac","#01665e"]);
+
+            // declaring range for Y axis
+            var yRange = d3.scale.ordinal()
+            .domain([0, total]).range([h , 0]);
+
+            // scaling the Y axis
+            var yAxis = d3.svg.axis().scale(yRange).orient("left").tickSize(2);
+
+            // making tips with info 
+            var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d){
+                return "<strong>Aantal: <span style='color: red'>" + d['2016A'] + "</span>";
+            });
+
+            // initializing SVG element
+            var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w + 100)
+            .attr("height", h);
+
+            // calling info tips
+            svg.call(tip);
+
+            // creating bars
+            svg.selectAll("rect")
+            .data(data.Fietsen)
+            .enter()
+            .append("rect")
+            .attr("class", "rect")
+            .style("fill", function(d){ return color(d["Procentueel"])})
+            .attr("x", function(d, i) {
+                return i * (w / data.Fietsen.length) + 50;
+            })
+            .attr("width", w  / data.Fietsen.length - barPadding)
+            .attr("y", function(d) {
+                return h - d['2016'] - (4 * d['2016']);  
+            })
+            .attr("height", function(d) {
+                return h - d['2016'];  
+            })
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
+
+            // adding percentages to bars
+            svg.selectAll("text")
+            .data(data.Fietsen)
+            .enter()
+            .append("text")
+            .text(function(d) {
+                return d[2016] + "%";
+            })
+            .attr("x", function(d, i) {
+                return i * (w  / data.Fietsen.length) + 80; 
+            })
+            .attr("y", function(d) {
+                return (h - d['2016']) -  (4 * d['2016']);              
+            })
+            .attr("font-family", "lucida console")
+            .attr("font-size", "15px");
+            
+            // adding Y axis
+            svg.append('g')
+            .attr('transform', 'translate(50, 30)')
+            .call(yAxis)
+            .append("text")
+            .attr("y", 0)
+            .attr("dy", ".71em")
+            .style("text-anchor", "start")
+            .style('font-weight','bold')
+            .text("Totaal in 2016")
+            .attr("font-family", "lucida console")
+            .attr("font-size", "12px")
+            .style("color", "dark blue");
+            
+            // initializing legend
+            var legend = svg.selectAll(".legend")
+            .data(categories, function(d){ return categories(d); })
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d,i) { return "translate(0," + i * 20 + ")"; });
+
+            // adding blocks for categories
+            legend.append("rect")
+            .attr("x", w - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", function(d) { return color(d); });
+
+            // adding text for categories
+            legend.append("text")
+            .attr("x", w - 24)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(categories, function(d){ return categories(d); })
+            .attr("font-family", "lucida console")
+            .attr("font-size", "11px");
+
+            // adding delay to legend
+            legend.transition().duration(500).delay(function(d,i){ return 1300 + 100 * i; }).style("opacity","1");
+            });   
+        </script>
+    </body>
+</html>  
