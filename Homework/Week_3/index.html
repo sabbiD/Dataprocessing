@@ -2,8 +2,9 @@
 Sebile Demirtas: 10548270
 Minor Programmeren
 Dataprocessing
-I chose to not use an X axis because some of my bars are really small and even a really thin line made them unclear. Also the color-change attribute when hovering on a bar did work before adding the legend but unfortunately I could not get it to work again. I did keep the code for it in the html.
-
+I chose to not use an X axis because some of my bars are really small and even a really thin line made them unclear. 
+Also the color-change attribute when hovering on a bar did work before adding the legend but unfortunately I could 
+not get it to work again. I did keep the code for it in the html.
 Sources:
 - www.alignedleft.com/tutorials/d3 (background knowledge about d3 and bar charts)
 - http://bl.ocks.org/Caged/6476579 (d3 tooltips)
@@ -50,15 +51,28 @@ Sources:
     <script type="text/javascript" src="d3/d3.v3.js"></script>
     </head>
     <body align="center">
-        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         <script src="https://d3js.org/d3-axis.v1.min.js"></script>
         <script type="text/javascript">
 
         // adding description 
-        d3.select("head").append("title").text("Fietsdepot Amsterdam Jaaroverzicht 2016");
-        d3.select("body").append("p").text("Waar komen de fietsen in het Fietsdepot Amsterdam vandaan?").style("font-family", "lucida console").style("font-size", "25px").style("color", "#8c510a");
-        d3.select("body").append("p").text("Dataprocessing").style("font-family", "lucida console").style("font-size", "15px").style("color", "#01665e");
-        d3.select("body").append("p").text("Sebile Demirtas 10548270").style("font-family", "lucida console").style("font-size", "12px").style("color", "#5ab4ac");
+        d3.select("head").append("title")
+            .text("Fietsdepot Amsterdam Jaaroverzicht 2016");
+        d3.select("body").append("p")
+            .text("Waar komen de fietsen in het Fietsdepot Amsterdam vandaan?")
+            .style("font-family", "lucida console")
+            .style("font-size", "20px")
+            .style("color", "#8c510a");
+        d3.select("body").append("p")
+            .text("Dataprocessing")
+            .style("font-family", "lucida console")
+            .style("font-size", "15px")
+            .style("color", "#01665e");
+        d3.select("body").append("p")
+            .text("Sebile Demirtas 10548270")
+            .style("font-family", "lucida console")
+            .style("font-size", "12px")
+            .style("color", "#5ab4ac");
 
         // accessing dataset
         d3.json('fietsen.json', function(data){
