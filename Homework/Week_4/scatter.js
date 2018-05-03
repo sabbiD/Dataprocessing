@@ -10,7 +10,7 @@
 
 window.onload = function(){
 
-  var gerdData = "http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/G_XGDP+TP_RS+TP_RSGRO+TP_RSXLF+TP_RSXEM+TP_TT+TP_TTGRO+TP_TTXLF+TP_TTXEM+G_FBXGDP+G_FGXGDP+TH_RS+TH_WRS+TH_WRXRS+P_PCT.AUT+BEL+FIN+FRA+DEU+IRL+LUX+NLD+NOR/all?startTime=2014&endTime=2015&dimensionAtObservation=allDimensions&pid=d7b2f3d1-df85-470b-bb56-5c9c8c92ef6d"
+  var gerdData = "https://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/G_XGDP+TP_RS+TP_RSGRO+TP_RSXLF+TP_RSXEM+TP_TT+TP_TTGRO+TP_TTXLF+TP_TTXEM+G_FBXGDP+G_FGXGDP+TH_RS+TH_WRS+TH_WRXRS+P_PCT.AUT+BEL+FIN+FRA+DEU+IRL+LUX+NLD+NOR/all?startTime=2014&endTime=2015&dimensionAtObservation=allDimensions&pid=d7b2f3d1-df85-470b-bb56-5c9c8c92ef6d"
 
   // declare empty list for coordinates 
   var gdpPercentage14 = [] //G_XGDP GERD as a percentage of GDP
