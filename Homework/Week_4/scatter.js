@@ -1,12 +1,13 @@
-// Data processing 2018
-// Sebile Demirtas 
-// 10548270
-// Sources:
-// - https://bl.ocks.org/d3noob/1ea51d03775b9650e8dfd03474e202fe (for easeBounce)
-// - https://bl.ocks.org/mbostock/3884955
-// - http://bl.ocks.org/schluppeck/b8745d4f4b98714a03a1da8e080d6a4e
-// - http://bl.ocks.org/WilliamQLiu/bd12f73d0b79d70bfbae
-// - https://bl.ocks.org/mbostock/3808218
+ /*
+ Data processing 2018
+ Sebile Demirtas 
+ 10548270
+ Sources:
+ - https://bl.ocks.org/d3noob/1ea51d03775b9650e8dfd03474e202fe (for easeBounce)
+ - http://bl.ocks.org/schluppeck/b8745d4f4b98714a03a1da8e080d6a4e (for animations/transitions)
+ - http://bl.ocks.org/WilliamQLiu/bd12f73d0b79d70bfbae (for animations/transitions)
+ - http://alignedleft.com/tutorials/d3 (introduction to making scatterplot in d3)
+ */
 
 window.onload = function(){
   
@@ -58,7 +59,7 @@ window.onload = function(){
     // define dimensions
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = 500 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 400 - margin.top - margin.bottom;
 
     // define range x 
     var x = d3.scaleLinear()
@@ -124,8 +125,8 @@ window.onload = function(){
     // add label to X axis
     svg.append("text")
     	.attr("class", "label")
-      .attr("x", 500 - margin.top - margin.bottom - 10)
-    	.attr("y", width + 6)
+      .attr("x", width)
+    	.attr("y", height - 6)
       .style("text-anchor", "end")
     	.text("GERD as % of GDP");
 
