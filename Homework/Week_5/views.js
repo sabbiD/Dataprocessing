@@ -12,7 +12,7 @@ window.onload = function(){
 	
 	// OECD API to load dataset
 	var gerdData = "https://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/G_XGDP+TP_RS+TP_RSGRO+TP_RSXLF+TP_RSXEM+TP_TT+TP_TTGRO+TP_TTXLF+TP_TTXEM+G_FBXGDP+G_FGXGDP+TH_RS+TH_WRS+TH_WRXRS+P_PCT.AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+EU15+OECD+NMEC+ARG+CHN+ROU+RUS+SGP+ZAF+TWN/all?startTime=2000&endTime=2017&dimensionAtObservation=allDimensions&pid=d7b2f3d1-df85-470b-bb56-5c9c8c92ef6d"
-	var betterLife = "/betterLifeIndex.csv"
+	var betterLife = "betterLifeIndex.csv"
 
 	d3.queue()
 	  .defer(d3.request, gerdData)
