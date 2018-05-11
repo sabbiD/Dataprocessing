@@ -92,7 +92,7 @@ window.onload = function(){
 	        .html(label + "</br>" + income_grp)
 			}
 		
-		d3.json("/europe.geo.json", function(json){
+		d3.json("europe.geo.json", function(json){
 
 			// setting scales accoring to json file of continent
 			projection.fitSize([width,height], json);
@@ -130,7 +130,7 @@ window.onload = function(){
         // get name of continent to update map
       	var continent = this.getAttribute('id');
 
-		json_file = "/" + continent +".geo.json";
+		json_file = continent +".geo.json";
 
 		d3.json(json_file, function(json){
 
