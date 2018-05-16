@@ -12,15 +12,13 @@
 //window.onload = function(){
   
   // OECD API to load dataset
-  var gerdData = "https://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/G_XGDP+TP_RS+TP_RSGRO+TP_RSXLF+TP_RSXEM+TP_TT+TP_TTGRO+TP_TTXLF+TP_TTXEM+G_FBXGDP+G_FGXGDP+TH_RS+TH_WRS+TH_WRXRS+P_PCT.AUT+BEL+FIN+FRA+DEU+IRL+LUX+NLD+NOR/all?startTime=2014&endTime=2015&dimensionAtObservation=allDimensions&pid=d7b2f3d1-df85-470b-bb56-5c9c8c92ef6d"
-
-/*  var gerdData = "https://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/G_XGDP+TP_RS+TP_RSGRO+TP_RSXLF+TP_RSXEM+TP_TT+TP_TTGRO+TP_TTXLF+TP_TTXEM+G_FBXGDP+G_FGXGDP+TH_RS+TH_WRS+TH_WRXRS+P_PCT.AUS+AUT+BEL+CAN+CHL+CZE+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+EU15+OECD+NMEC+ARG+CHN+ROU+RUS+SGP+ZAF+TWN/all?startTime=2000&endTime=2017&dimensionAtObservation=allDimensions&pid=d7b2f3d1-df85-470b-bb56-5c9c8c92ef6d"
-*/
+  var researchWB = "researchDataWorldBank.json"
+  var patentsWB= "patentDataWorldBank.json"
+  
   // declare empty list for coordinates 
-  var gdpPercentage14 = [] //G_XGDP GERD as a percentage of GDP
-  var patents14 = [] //P_PCT
-  var total14 = []
-  var total15 = []
+  var research60 = [] //G_XGDP GERD as a percentage of GDP
+  var patents60 = [] //P_PCT
+  var total60 = []
 
   // declare empty list for country Ids
   var countryNames = []
@@ -28,41 +26,43 @@
   // size of scatters
   var scatterSize = 5;
 
-  function old_callback(data){
+  d3.queue()
+    .defer(d3.json, patentsWB)
+    .defer(d3.json, researchWB)
+    .awaitAll(old_callback)
+
+
+  function old_callback(error, data){
+    
+    var patents = data[0]
+    var research = data[1]
 
     // check if data loads correctly
     if (data.lenght == 0){
       throw error;
     } 
     
-
-    // collect datapoints for 9 countries
-    for (var i = 0; i < 9 ; i++){
-    
-    	gdpPercentage14.push(data.dataSets["0"]
-                          .observations["0:"+i+":0"][0])
+    // collect datapoints for 267 countries
+    for (var i = 3; i < 267; i++){
       
-    	patents14.push(data.dataSets["0"]
-                    .observations["14:"+i+":0"][0])
-    	
-      total14.push([data.dataSets["0"].observations["14:"+i+":0"][0],
-                    data.dataSets["0"].observations["0:"+i+":0"][0]])
 
-    	total15.push([data.dataSets["0"].observations["14:"+i+":1"][0], 
-                    data.dataSets["0"].observations["0:"+i+":1"][0]])
+      total60.push({
+        
+        key: patents[i].FIELD1,
+        value: [patents[i].FIELD60 , research[i].FIELD60]
 
-      countryNames.push(data.structure.dimensions
-                      .observation[1].values[i].id)
+      })
+
+      research60.push(research[i].FIELD60)
+      patents60.push(patents[i].FIELD60)
 
     }
 
-    // list for countries to append to legend 
-    var countries = d3.scaleOrdinal(countryNames)
 
     // define dimensions
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 400 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+    width = 500 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
 
     // define range x 
     var x = d3.scaleLinear()
@@ -73,7 +73,7 @@
         .range([height, 0]);
 
     // colorscale for scatters and legend
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
 
     // define X axis with range
     var xAxis = d3.axisBottom(x);
@@ -82,52 +82,96 @@
     var yAxis = d3.axisLeft(y);
 
     // domain for X and Y axis
-    x.domain(d3.extent(gdpPercentage14, function(d) { return d; })).nice();
-    y.domain(d3.extent(patents14, function(d) { return d; })).nice();
+    x.domain(d3.extent(research60, function(d) { return d; })).nice();
+    y.domain(d3.extent(patents60, function(d) { return d/1000; })).nice();
 
     // create SVG element
-    var svg = d3.select("#scatter")
+    var plot = d3.select("#scatter")
       .append("svg")
+      .attr("class", "scatter")
     	.attr("width", width + margin.left + margin.right)
     	.attr("height", height + margin.top + margin.bottom)
     	.append("g")
     	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    
+    function quickUpdate(){
 
-    // creating points for 2014
-    svg.selectAll("circle")
-      .data(total14)
+    plot.selectAll("circle")
+      .remove()
+
+    plot.selectAll(".legend")
+    .remove()
+
+    countryNames = []
+
+    // add scatters to plot only if country is in continent
+    plot.selectAll("circle")
+      .data(total60)
     .enter().append("circle")
       .attr("cx", function(d) {
-          return x(d[1]);
+          var xCoord = d.value[1]
+
+          return x(xCoord);
       })
       .attr("cy", function(d) {
-          return y(d[0]);
+          var yCoord =  d.value[0]
+
+          return y(yCoord);
       })
-      .attr("r", scatterSize)
-      .style("fill", function(d){ return color(d[0]); });
-    	
+      .attr("r", function(d, i){
+        
+        if (d.value[0] === null || d.value[1] === null){
+          return 0;
+        }
+
+        else if (countriesGeo.includes(d.key) === true){
+          countryNames.push(d.key)
+          return scatterSize;
+        }
+        
+        else {
+        return 0;
+        }
+        })
+      .style("fill", function(d, i){
+        
+        if (d.value[0] === null || d.value[1] === null){
+          return 0;
+        }
+
+        else if (countriesGeo.includes(d.key) === true){
+          return color(d.key);
+        }
+        
+        else {
+        return 0;}
+        })
+    
+    var namesLegend = d3.scaleOrdinal(countryNames)
+
     // create X axis
-    svg.append("g")
+    plot.append("g")
     	.attr("class", "x axis")
     	.attr("transform", "translate(0," + height + ")")
     	.call(xAxis);
 
     // create Y axis
-    svg.append("g")
+    plot.append("g")
       .attr("class", "y axis")
       .call(yAxis);
 
     // add label to Y axis
-    svg.append("text")
+    plot.append("text")
     	.attr("class", "label")
     	.attr("y", 6)
       .attr("dy", ".71em")
       .attr("transform", "rotate(-90)")
     	.style("text-anchor", "end")
-    	.text("Patent applications");
+    	.text("Patent applications x 1000");
     
     // add label to X axis
-    svg.append("text")
+    plot.append("text")
     	.attr("class", "label")
       .attr("x", width)
     	.attr("y", height - 6)
@@ -135,27 +179,30 @@
     	.text("GERD as % of GDP");
 
     // call legend 
-    var legend = svg.selectAll("legend")
-      .data(total14)
+    var legend = plot.selectAll("legend")
+      .data(countryNames)
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d,i){ return "translate(0," + i * 20 + " )"})
+      .attr("transform", function(d,i){ return "translate(0," + i * 10 + " )"})
 
     // add squares to legend
     legend.append("rect")
       .attr("x", width)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", function(d){ return color(d[0]);} )
+      .attr("width", 9)
+      .attr("height", 9)
+      .style("fill", function(d){ return color(d)})
 
     // add country ids to legend
     legend.append("text")
+    .data(countryNames)
       .attr("class", "label")
       .attr("x", width - 6)
-      .attr("y", 9)
+      .attr("y", 1)
       .attr("dy", ".35em")
       .style("text-anchor", "end")
-      .text(countries, function(d){ return countries(d); })
+      .text(function(d){ 
+        return namesLegend(d);
+        })
 
     // add function to legend 
     // when clicked on squares corresponding 
@@ -163,125 +210,39 @@
     legend.on("click", function(type){
       d3.selectAll("circle")
           .style("opacity", 0.35)
-          .attr("r", scatterSize)
           .filter(function(d){
-            return d == type;
+            return d.key == type;
           })
           .style("opacity", 1)
-          .attr("r", scatterSize * 2)
+          .attr("r", r * 2)
 
         })
+}
+    
+    // draw scatter first time
+    quickUpdate();
 
-    // calling 2014 data
-    function scatter(){
+    // function to update both graphs 
+    function changeBoth(){
 
-      // changing back to old domains 
-      x.domain(d3.extent(gdpPercentage14, function(d) { return d; })).nice();
-      y.domain(d3.extent(patents14, function(d) { return d; })).nice();
+        var continent = this.getAttribute('id');
 
-      // creating points for 2014
-      svg.selectAll("circle")
-        .data(total14)
-        .transition()
-        .duration(1000)
-        .ease(d3.easeBounce)
-        .on("start", function() {
-            d3.select(this)
-                .attr("r", scatterSize * 2)
-                .style("opacity", 1)
-              })
-        .attr("cx", function(d) {
-            return x(d[1]);
-        })
-        .attr("cy", function(d) {
-            return y(d[0]);
-        })
-        .on("end", function() {
-            d3.select(this)
-                .transition()
-                .duration(500)
-                .attr("r", scatterSize)
-        });
+        changeMap(continent);
+        quickUpdate();
 
-      // legend with attributes as mentioned above
-      legend.on("click", function(type){
-          d3.selectAll("circle")
-            .style("opacity", 0.35)
-            .attr("r", scatterSize)
-            .filter(function(d){
-              return d == type;
-            })
-            .style("opacity", 1)
-            .attr("r", scatterSize * 2);
-        })
-    }
+      } 
 
-    // calling 2015 data
-    function update(){
-
-      // updating scales for new data
-      var xNew = d3.scaleLinear()
-      .range([0, width]);
-
-      var yNew = d3.scaleLinear()
-      .range([height, 0]);
-
-      // updating dowmains for new data
-      xNew.domain(d3.extent(total15, function(d) { 
-          return d[1]; 
-      })).nice();
-
-      yNew.domain(d3.extent(total15, function(d) { 
-          return d[0]; 
-      })).nice();
-      
-      // creating points for 2015
-      svg.selectAll("circle")
-        .data(total15)
-        .transition()
-        .duration(1000)
-        .ease(d3.easeBounce)
-        .on("start", function() {
-            d3.select(this) 
-                .attr("r", scatterSize * 2)  
-                .style("opacity", 1)
-              })
-        .attr("cx", function(d) {
-            return xNew(d[1]);
-        })
-        .attr("cy", function(d) {
-            return yNew(d[0]);
-        })
-        .on("end", function() {
-            d3.select(this)
-                .transition()
-                .duration(500)
-                .attr("r", scatterSize)
-        });
-
-      // legend with attributes as mentioned above
-      legend.on("click", function(type){
-        d3.selectAll("circle")
-          .data(total14)
-          .style("opacity", 0.35)
-          .attr("r", scatterSize)
-          .filter(function(d){
-            return d == type;
-          })
-          .style("opacity", 1)
-          .attr("r", scatterSize * 2);
-      });
-    }
-
-    // call 2014 data when 2014 button is clicked
-    document.getElementById("2014").onclick=scatter;
-
-    // call 2015 data when 2015 button is clicked
-    document.getElementById("2015").onclick=update;
+      // linking buttons to update correct maps
+      document.getElementById("europe").onclick=changeBoth
+      document.getElementById("africa").onclick=changeBoth
+      document.getElementById("asia").onclick=changeBoth
+      document.getElementById("southAmerica").onclick=changeBoth
+      document.getElementById("northAmerica").onclick=changeBoth
+      document.getElementById("world").onclick=changeBoth
 
   }
 
-  // get data from OECD-API
-  d3.request(gerdData)
-  .get(function(xhr) {old_callback(JSON.parse(xhr.responseText))});
+  
+
+  
 //};

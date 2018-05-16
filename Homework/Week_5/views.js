@@ -8,52 +8,67 @@
  -https://bl.ocks.org/mbostock/3306362(chloropeth map)
  */
 
-window.onload = function(){
+//window.onload = function(){
 	
-	// OECD API to load dataset
-	var gerdData = "https://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/G_XGDP+TP_RS+TP_RSGRO+TP_RSXLF+TP_RSXEM+TP_TT+TP_TTGRO+TP_TTXLF+TP_TTXEM+G_FBXGDP+G_FGXGDP+TH_RS+TH_WRS+TH_WRXRS+P_PCT.AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+EU15+OECD+NMEC+ARG+CHN+ROU+RUS+SGP+ZAF+TWN/all?startTime=2000&endTime=2017&dimensionAtObservation=allDimensions&pid=d7b2f3d1-df85-470b-bb56-5c9c8c92ef6d"
-	var betterLife = "betterLifeIndex.csv"
+	// find datasets
+	var countriesGeo = []//new Set();
+	var africa = "Africa.geo.json"
+	var asia = "Asia.geo.json"
+	var southAmerica = "SouthAmerica.geo.json"
+	var northAmerica = "NorthAmerica.geo.json"
+	var europe = "Europe.geo.json"
+	var oceania = "Oceania.geo.json"
+	var world = "World.geo.json"
+	var changeMap;
 
 	d3.queue()
-	  .defer(d3.request, gerdData)
-	  .defer(d3.csv, betterLife)
+	  .defer(d3.request, southAmerica)
+	  .defer(d3.request, northAmerica)
+	  .defer(d3.request, africa)
+	  .defer(d3.request, europe)
+	  .defer(d3.request, asia)
+	  .defer(d3.request, oceania)
+	  .defer(d3.request, world)
 	  .awaitAll(callback);
 
 
 	// define dimensions
-	var width = 400,
-	height = 300 
+	var width = 400
+	var height = 300 
 	
 	function callback(error, response) {
 		if (error) throw error;
 
-		var gerdData = JSON.parse(response[0].responseText);
-		var betterLife = response[1]
+			// define dimensions
+	var width = 400
+	var height = 300
 
-		// list with countries from OECD dataset
-		var countriesGerd = []
+		var southAmerica = JSON.parse(response[0].responseText)
+		var northAmerica = JSON.parse(response[1].responseText)
+		var africa = JSON.parse(response[2].responseText)
+		var europe = JSON.parse(response[3].responseText)
+		var asia = JSON.parse(response[4].responseText)
+		var oceania = JSON.parse(response[5].responseText)
+		var world = JSON.parse(response[6].responseText)
 
-		// dictionary with country names and values for 
-		// employees working very long hours
-		var workBetterLife = [] 
+		// dict with json files as values to use in update function
+		var continents = []
 
-		var oecdLength = gerdData.structure.dimensions.observation[1].values.length
-
-		for (var i = 0; i < 38; i++){
-			workBetterLife.push({
-				
-				key: betterLife[i].Country,
-				value: betterLife[3164 + i].Value
-
-		})}
-
-		for (var i = 0; i < oecdLength; i++){
-
-			countriesGerd.push(gerdData.structure.dimensions.observation[1].values[i].name)
-		}
+		continents["asia"] = asia
+		continents["africa"] = africa
+		continents["southAmerica"] = southAmerica
+		continents["northAmerica"] = northAmerica
+		continents["europe"] = europe
+		continents["oceania"] = oceania
+		continents["world"] = world
 
 		// color scale map 
-		var mapColor = d3.scaleThreshold()
+		var legendColor = d3.scaleOrdinal()
+		.domain(["High", "High (non-OECD)", "Upper Middle", "Lower Middle", "Low"])
+		.range(["#f0f9e8" ,"#bae4bc" ,"#7bccc4", "#43a2ca", "#0868ac"].reverse())
+
+		// color scale map 
+		var mapColor = d3.scaleOrdinal()
 		.domain([1, 2, 3, 4, 5])
 		.range(["#f0f9e8" ,"#bae4bc" ,"#7bccc4", "#43a2ca", "#0868ac"].reverse())
 
@@ -76,6 +91,25 @@ window.onload = function(){
 				.append("svg")
 				.attr("width", width)
 				.attr("height", height);
+  		
+  		var ordinal = d3.scaleOrdinal()
+		  .domain(["1", "2", "3", "4", "5"])
+		  .range(["#f0f9e8" ,"#bae4bc" ,"#7bccc4", "#43a2ca", "#0868ac"]); 
+
+		var svg = d3.select("svg");
+
+		svg.append("g")
+		  .attr("class", "legendOrdinal")
+		  .attr("transform", "translate(20,250)");
+
+		var legendOrdinal = d3.legendColor()
+		  .shapeWidth(30)
+		  .orient('horizontal')
+		  .scale(ordinal);
+
+		svg.select(".legendOrdinal")
+		  .call(legendOrdinal);
+
 
 		// tooltips with info on map
 		function showTooltip(d) {
@@ -92,94 +126,89 @@ window.onload = function(){
 	        .html(label + "</br>" + income_grp)
 			}
 		
-		d3.json("europe.geo.json", function(json){
 
-			// setting scales accoring to json file of continent
-			projection.fitSize([width,height], json);
+		// setting scales accoring to json file of continent
+		projection.fitSize([width, height], europe);
 
-			// list with countries in geo.json file
-			let countriesGeo = []
-			for (var i = 0; i < json.features.length; i++){
+		// list with countries in geo.json file
+		for (var i = 0; i < europe.features.length; i++){
 
-				countriesGeo.push(json.features[i].properties.admin)
+			countriesGeo.push(europe.features[i].properties.admin)
 
-			}
+		}
 
-			// add countries to map with country name as class
-			svg.selectAll("path")
-				.data(json.features)
-				.enter()
-				.append("path")
-				.attr("d", path)
-				.attr("class", function(d) { return d.properties.admin })
-				.attr("stroke", "grey")
-				.attr("fill", function(d){ return mapColor(d.properties.income_grp[0]);})
-      			.on("mousemove", showTooltip)
-          		.on("mouseout",  function(d,i) {
-              	tooltip.classed("hidden", true);
-           								})
-      		})
+		// add countries to map with country name as class
+		svg.selectAll("path")
+			.data(europe.features)
+			.enter()
+			.append("path")
+			.attr("d", path)
+			.attr("id", function(d) { return d.properties.admin })
+			.attr("stroke", "grey")
+			.attr("fill", function(d){ return mapColor(d.properties.income_grp[0]);})
+  			.on("mousemove", showTooltip)
+      		.on("mouseout",  function(d,i) {
+          	tooltip.classed("hidden", true);
+       								})
+  		
 
 		// changing map for continents
-      	function changeMap(){
+      	function changeMapz(continent){
 
       	// clearing svg for new map
       	svg.selectAll("path")
         .remove()
 
+        // color scale map 
+		var mapColor = d3.scaleOrdinal()
+		.domain([1, 2, 3, 4, 5])
+		.range(["#f0f9e8" ,"#bae4bc" ,"#7bccc4", "#43a2ca", "#0868ac"].reverse())
+
         // get name of continent to update map
-      	var continent = this.getAttribute('id');
-
-		json_file = continent +".geo.json";
-
-		d3.json(json_file, function(json){
-
-			// setting scales according to json file of continent
-			projection.fitSize([width,height], json);
-
-
-			let countriesGeo = []
+      	var json = continents[continent]
+		
+		// setting scales according to json file of continent
+		projection.fitSize([width,height], json);
+		
+		// empty list with countries for new continent
+		countriesGeo = []
+			
 			for (var i = 0; i < json.features.length; i++){
 
 				countriesGeo.push(json.features[i].properties.admin)
 
 			}
 			
-			// add countries to map with country name as class
-			svg.selectAll("path")
-				.data(json.features)
-				.enter()
-				.append("path")
-				.attr("d", path)
-				.attr("class", function(d) { return d.properties.admin })
-				.attr("stroke", "grey")
-				.attr("fill", function(d){ return mapColor(d.properties.income_grp[0]);})
-				.on("mousemove", showTooltip)
-          		.on("mouseout",  function(d,i) {
-              	tooltip.classed("hidden", true);
+		// add countries to map with country name as class
+		svg.selectAll("path")
+			.data(json.features)
+			.enter()
+			.append("path")
+			.attr("d", path)
+			.attr("id", function(d) { return d.properties.admin })
+			.attr("class", "country")
+			.attr("stroke", "grey")
+			.attr("fill", function(d){ return mapColor(d.properties.income_grp[0]);})
+  			.on("mousemove", showTooltip)
+      		.on("mouseout",  function(d,i) {
+          	tooltip.classed("hidden", true);
            								})
-		
-        })
+      		.on("click", function(type){
+      			d3.selectAll("circle")
+          		.style("opacity", 0.35)
+          		.filter(function(d){
+          			console.log(d.key, type.properties.admin)
+            	return d.key == type.properties.admin;
+          		})
+          		.style("opacity", 1)
+          	})
+
 	}
 
-	// does not work yet!
-	/*var zoom = d3.zoom()
-	  .scaleExtent([1, 100])
-	  .on('zoom', zoomFn);
-
-	function zoomFn() {
-	  d3.select('#container').select('svg').select("path")
-	    .attr('transform', 'translate(' + 0 + ',' + 0 + ') scale(' + d3.event.transform.k + ')');
-	}
-	
-	d3.select('#container').select("svg").select('path').call(zoom);*/
-	
-	// linking buttons to update correct maps
-	document.getElementById("Europe").onclick=changeMap
-	document.getElementById("Oceania").onclick=changeMap
-	document.getElementById("Africa").onclick=changeMap
-	document.getElementById("Asia").onclick=changeMap
-	document.getElementById("South America").onclick=changeMap
-	document.getElementById("North America").onclick=changeMap
-	}
+  // making function global to be able to call later
+  changeMap = changeMapz;
 }
+
+
+
+
