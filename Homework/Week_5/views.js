@@ -12,13 +12,13 @@
 	
 	// find datasets
 	var countriesGeo = []//new Set();
-	var africa = "Africa.geo.json"
-	var asia = "Asia.geo.json"
-	var southAmerica = "SouthAmerica.geo.json"
-	var northAmerica = "NorthAmerica.geo.json"
-	var europe = "Europe.geo.json"
-	var oceania = "Oceania.geo.json"
-	var world = "World.geo.json"
+	var africa = "Africa.json"
+	var asia = "Asia.json"
+	var southAmerica = "SouthAmerica.json"
+	var northAmerica = "NorthAmerica.json"
+	var europe = "Europe.json"
+	var oceania = "Oceania.json"
+	var world = "World.json"
 	var changeMap;
 
 	d3.queue()
