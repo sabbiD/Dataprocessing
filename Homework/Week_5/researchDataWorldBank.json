@@ -1560,7 +1560,7 @@
    "FIELD63": ""
  },
  {
-   "FIELD1": "Bahamas, The",
+   "FIELD1": "The Bahamas",
    "FIELD2": "BHS",
    "FIELD3": "Research and development expenditure (% of GDP)",
    "FIELD4": "GB.XPD.RSDV.GD.ZS",
@@ -3699,7 +3699,7 @@
    "FIELD57": 2.86632,
    "FIELD58": 2.8173,
    "FIELD59": 2.89227,
-   "FIELD60": 2.87749,
+   "FIELD60": null,
    "FIELD61": null,
    "FIELD62": null,
    "FIELD63": ""
@@ -5129,7 +5129,7 @@
    "FIELD57": 2.22579,
    "FIELD58": 2.23406,
    "FIELD59": 2.23919,
-   "FIELD60": 2.23135,
+   "FIELD60": null,
    "FIELD61": null,
    "FIELD62": null,
    "FIELD63": ""
@@ -5389,7 +5389,7 @@
    "FIELD57": 1.6075,
    "FIELD58": 1.65949,
    "FIELD59": 1.6813,
-   "FIELD60": 1.70304,
+   "FIELD60": null,
    "FIELD61": null,
    "FIELD62": null,
    "FIELD63": ""
@@ -9874,7 +9874,7 @@
    "FIELD57": 0.41733,
    "FIELD58": 0.35248,
    "FIELD59": 0.37071,
-   "FIELD60": 0.36967,
+   "FIELD60": null,
    "FIELD61": null,
    "FIELD62": null,
    "FIELD63": ""
@@ -12474,7 +12474,7 @@
    "FIELD57": 0.88055,
    "FIELD58": 0.8689,
    "FIELD59": 0.94001,
-   "FIELD60": 1.00337,
+   "FIELD60": null,
    "FIELD61": null,
    "FIELD62": null,
    "FIELD63": ""
@@ -16380,7 +16380,7 @@
    "FIELD63": ""
  },
  {
-   "FIELD1": "United States",
+   "FIELD1": "United States of America",
    "FIELD2": "USA",
    "FIELD3": "Research and development expenditure (% of GDP)",
    "FIELD4": "GB.XPD.RSDV.GD.ZS",
