@@ -112,6 +112,7 @@ window.onload = function(){
 
       
       // add scatters to plot only if country is in continent
+      // if not in continent width = 0
       plot.selectAll("circle")
         .data(total60)
       .enter().append("circle")
